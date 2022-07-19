@@ -37,8 +37,8 @@ export interface DateRangePickerDropdownProps
 export function DateRangePickerEmbedded({
   locale = '',
   startOfWeek,
-  isDateEnabled,
-  isValidRange,
+  isDateEnabled = () => true,
+  isValidRange = () => ({ valid: true }),
   value,
   relativeOptions,
   isSingleGrid,
@@ -75,6 +75,8 @@ export function DateRangePickerEmbedded({
       ref={scrollableContainerRef}
       className={styles.dropdown}
       tabIndex={0}
+      role="dialog"
+      aria-modal="true"
       aria-label={i18nStrings.ariaLabel}
       aria-labelledby={ariaLabelledby ?? i18nStrings.ariaLabelledby}
       aria-describedby={ariaDescribedby ?? i18nStrings.ariaDescribedby}
