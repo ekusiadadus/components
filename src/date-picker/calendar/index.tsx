@@ -13,6 +13,8 @@ import Grid, { DateChangeHandlerNullable } from './grid';
 import moveFocusHandler from './utils/move-focus-handler';
 import { useUniqueId } from '../../internal/hooks/use-unique-id/index.js';
 import { useMergeRefs } from '../../internal/hooks/use-merge-refs/index.js';
+import { getWeekStartByLocale } from 'weekstart';
+import { normalizeLocale } from './utils/locales';
 
 export interface DateChangeHandler {
   (detail: CalendarTypes.DateDetail): void;
@@ -30,7 +32,7 @@ interface HeaderChangeMonthHandler {
 
 interface CalendarProps extends BaseComponentProps {
   locale: string;
-  startOfWeek: DayIndex;
+  startOfWeek: number | undefined;
   selectedDate: Date | null;
   displayedDate: Date;
   focusedDate?: Date | null;
@@ -64,6 +66,11 @@ const Calendar = React.forwardRef(
     }: CalendarProps,
     ref
   ) => {
+    const normalizedLocale = normalizeLocale('DatePicker', locale ?? '');
+    const normalizedStartOfWeek = (
+      typeof startOfWeek === 'number' ? startOfWeek : getWeekStartByLocale(normalizedLocale)
+    ) as DayIndex;
+
     const focusVisible = useFocusVisible();
     const headerId = useUniqueId('calendar-dialog-title-');
     const elementRef = useRef<HTMLDivElement>(null);
@@ -165,7 +172,7 @@ const Calendar = React.forwardRef(
               onSelectDate={onSelectDate}
               onFocusDate={onFocusDate}
               onChangeMonth={onChangeMonth}
-              startOfWeek={startOfWeek}
+              startOfWeek={normalizedStartOfWeek}
               todayAriaLabel={todayAriaLabel}
               selectedDate={selectedDate}
               handleFocusMove={moveFocusHandler}

@@ -2,34 +2,36 @@
 // SPDX-License-Identifier: Apache-2.0
 import React from 'react';
 import { DatePickerProps } from './interfaces';
-import Calendar, { DayIndex } from './calendar';
+import Calendar from './calendar';
 import { memoizedDate } from './calendar/utils/date';
+import { useDatePicker } from './use-date-picker';
 import { CalendarTypes } from './calendar/definitions';
 
 export const DatePickerEmbedded = ({
-  calendarRef,
-  selectedDate,
-  focusedDate,
-  displayedDate,
+  value,
+  locale = '',
   normalizedLocale,
-  normalizedStartOfWeek,
+  startOfWeek,
   isDateEnabled,
-  calendarHasFocus,
   nextMonthAriaLabel,
   previousMonthAriaLabel,
   todayAriaLabel,
-  onChangeMonthHandler,
-  onSelectDateHandler,
+  calendarHasFocus,
+  focusedDate,
   onDateFocusHandler,
 }: DatePickerEmbeddedProps) => {
+  const { displayedDate, selectedDate, onChangeMonthHandler, onSelectDateHandler } = useDatePicker({
+    locale,
+    value,
+  });
+
   return (
     <Calendar
-      ref={calendarRef}
       selectedDate={memoizedDate('value', selectedDate)}
       focusedDate={memoizedDate('focused', focusedDate)}
       displayedDate={memoizedDate('displayed', displayedDate)}
       locale={normalizedLocale}
-      startOfWeek={normalizedStartOfWeek}
+      startOfWeek={startOfWeek}
       isDateEnabled={isDateEnabled ? isDateEnabled : () => true}
       calendarHasFocus={calendarHasFocus}
       nextMonthLabel={nextMonthAriaLabel}
@@ -42,19 +44,22 @@ export const DatePickerEmbedded = ({
   );
 };
 
-export interface DatePickerEmbeddedProps {
-  calendarRef: React.RefObject<HTMLDivElement>;
-  selectedDate: string | null;
-  focusedDate: string | null;
-  displayedDate: string;
-  normalizedLocale: string;
-  normalizedStartOfWeek: DayIndex;
-  isDateEnabled: DatePickerProps.IsDateEnabledFunction | undefined;
+export type DatePickerEmbeddedProps = Omit<
+  DatePickerProps,
+  | 'placeholder'
+  | 'openCalendarAriaLabel'
+  | 'name'
+  | 'disabled'
+  | 'readOnly'
+  | 'autoFocus'
+  | 'ariaLabel'
+  | 'ariaRequired'
+  | 'onFocus'
+  | 'onBlur'
+  | 'onChange'
+> & {
   calendarHasFocus: boolean;
-  nextMonthAriaLabel: string;
-  previousMonthAriaLabel: string;
-  todayAriaLabel: string;
-  onChangeMonthHandler: (newMonth: Date) => void;
-  onSelectDateHandler: ({ date }: CalendarTypes.DateDetail) => void;
+  focusedDate: string | null;
   onDateFocusHandler: ({ date }: CalendarTypes.DateDetailNullable) => void;
-}
+  normalizedLocale: string;
+};
